@@ -1,0 +1,37 @@
+body {
+	background-color: #000000;
+}
+
+.container-fluid {
+	padding: 40px 0px 0px 0px;
+	margin: 0px -15px 0px -15px;
+}
+
+#map {
+  display: block;
+  height: 100%;
+  width: 100%;
+  margin: 0 0%;
+}
+
+#mapDiv {
+  height: 90vh;
+  padding: 0px 0px 0px 0px;
+  margin: 0px 0px 0px 0px;
+}
+
+.input-group {
+	padding: 0px 0px 0px 10px;
+}
+
+ul {
+	padding: 10px 0px 0px 10px;
+}
+
+.shop-panel {
+	min-width: 240px;
+}
+
+.shop-list {
+	padding: 10px 0px 0px 10px;
+}
