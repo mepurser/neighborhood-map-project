@@ -43,7 +43,7 @@ function initializeMap() {
       var locDetails = [
         formatted_address,
         shops[shop].shopName,
-        shops[shop].yelp
+        shops[shop].streetView
       ];
       locations.push(locDetails);
     }
@@ -58,10 +58,12 @@ function initializeMap() {
   */
   function createMapMarker(placeData) {
     
-    function addMarkerContent {          
+    function addMarkerContent(data) {          
+      console.log(api_req_str);
+
       contentstring = '<div><b>' + locName + '</b></div>';
-      contentstring +='<img src="'+item.photo_url+'"><br>';
-      contentstring +='<a href="'+item.url+'" target="_blank">see it on yelp</a>';
+      contentstring +='<img src="'+api_req_str+'"><br>';
+
 
       // marker is an object with additional data about the pin for a single location
       var marker = new google.maps.Marker({
@@ -103,19 +105,21 @@ function initializeMap() {
 
     var contentstring = {};
 
-    var url = 'https://api.yelp.com/v2/business/fentons-creamery-oakland-2?';
-    
-    var data = {
-      var oauth_consumer_key : 'DwYObI6fJhbNJc0I3qG0oQ',
-      var oauth_token : 'vJLaGEB28oWv8nzwZQEdnH-xQMMu7tWA',
-      var oauth_signature_method : 'hmac-sha1',
-      var oauth_signature : 'STMQB5P6qd_C76TvLGHNd-6y58U',
-      var oauth_timestamp : '',
-      var oauth_nonce : ''
-    }
-    
+    var url = 'https://maps.googleapis.com/maps/api/streetview';
+    var streetViewLoc = ""
 
-    $.getJSON(url, data, addMarkerContent());
+    var size = '300x150';
+    var key = 'AIzaSyCyqnlShlfX9Pc2m8o2RmlpeCEhyY1D0os';
+
+    api_req_str = 
+      url + '?' +
+      'size=' + size + '&' +
+      'location=' + locStreetView.location + '&' +
+      'heading=' + locStreetView.heading + '&' +
+      'pitch=' + locStreetView.pitch + '&' +
+      'key=' + key;
+
+    addMarkerContent(api_req_str);
 
   }
 
@@ -126,7 +130,7 @@ function initializeMap() {
   function callback(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
       locName = locations[locIndex][1];
-      locYelp = locations[locIndex][2];
+      locStreetView = locations[locIndex][2];
       createMapMarker(results[0]);
       locIndex += 1;
     }
@@ -138,7 +142,7 @@ function initializeMap() {
   */
 
   var locName = "";
-  var locYelp = "";
+  var locStreetView = "";
 
   function pinPoster(locations) {
 
@@ -153,7 +157,7 @@ function initializeMap() {
       var request = {
         query: locations[place][0],
         locName: locations[place][1],
-        locYelp: locations[place][2]
+        locStreetView: locations[place][2]
       };
 
       // Actually searches the Google Maps API for location data and runs the callback

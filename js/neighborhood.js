@@ -3,7 +3,7 @@ markersDisplayed = ko.observableArray([]);
 infoDisplayed = ko.observableArray([]);
 
 // class to represent row in the available shops array
-function IceCreamShop(shopName, address1, address2, city, state, zip, yelp) {
+function IceCreamShop(shopName, address1, address2, city, state, zip, streetView) {
 	var self = this;
 	self.shopName = shopName;
 	self.address1 = address1;
@@ -11,8 +11,9 @@ function IceCreamShop(shopName, address1, address2, city, state, zip, yelp) {
 	self.city = city;
 	self.state = state;
 	self.zip = zip;
-	self.yelp = yelp;
+	self.streetView = streetView;
 }
+
 
 function shopsViewModel() {
 	var self = this;
@@ -21,15 +22,15 @@ function shopsViewModel() {
 	// hard-wired initial list of ice cream shops
 	self.shopsAvailable = [
 			new IceCreamShop('Fentons Creamery', '4226 Piedmont Ave', '', 'Oakland', 'California', '94611',
-				'https://api.yelp.com/v2/business/fentons-creamery-oakland-2'),
+				{location:'37.8281384,-122.2501302', heading: '142', pitch: '-2.18525'}),
 			new IceCreamShop('Curbside Creamery', '482 49th St', '', 'Oakland', 'California', '94609',
-				''),
+				{location:'37.8358959,-122.2621143', heading: '37.96', pitch: ''}),
 			new IceCreamShop('Ben and Jerrys', '505 Embarcadero West', '', 'Oakland', 'California', '94607',
-				''),
+				{location:'37.7959185,-122.2780369', heading: '229.48', pitch: ''}),
 			new IceCreamShop('Sweet Booth', '388 9th St', '', 'Oakland', 'California', '94607',
-				''),
+				{location:'37.8003083,-122.2718405', heading: '26.85', pitch: ''}),
 			new IceCreamShop('Smitten Ice Cream', '5800 College Ave', '', 'Oakland', 'California', '94618',
-				'')
+				{location:'37.846053,-122.2516726', heading: '327.45', pitch: ''})
 	]
 
 
