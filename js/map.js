@@ -59,7 +59,6 @@ function initializeMap() {
   function createMapMarker(placeData) {
     
     function addMarkerContent(data) {          
-      console.log(api_req_str);
 
       contentstring = '<div><b>' + locName + '</b></div>';
       contentstring +='<img src="'+api_req_str+'"><br>';
@@ -83,6 +82,16 @@ function initializeMap() {
 
 
       google.maps.event.addListener(marker, 'click', function() {
+        
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function() { 
+          marker.setAnimation(null);
+        }, 1400);
+        
+        for (marker_close in markers()) {
+          infoWindows()[marker_close].close(map, markers()[marker_close]);
+        }
+        
         infoWindow.open(map, marker);
       });
 

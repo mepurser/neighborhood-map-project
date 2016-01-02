@@ -73,6 +73,7 @@ function shopsViewModel() {
 				markersDisplayed.push(markers()[shop]);
 				infoDisplayed.push(infoWindows()[shop]);
 				if (markers().length > 0) {
+					console.log(markersDisplayed()[dispCount]);
 					markersDisplayed()[dispCount].setMap(map);
 				}
 			}
@@ -87,8 +88,8 @@ function shopsViewModel() {
 		// 'filter' function above. two lines below check if markersDisplayed
 		// and infoDisplayed are undefined after 'filter' function completes.
 		// if so, they reset their values to the full set.
-		if (markersDisplayed()[0] === undefined) {markersDisplayed = ko.observableArray(markers());}
-		if (infoDisplayed()[0] === undefined) {infoDisplayed = ko.observableArray(infoWindows());}
+		if (markersDisplayed()[0] === undefined) {new markersDisplayed = ko.observableArray(markers());}
+		if (infoDisplayed()[0] === undefined) {new infoDisplayed = ko.observableArray(infoWindows());}
 
 		// loop through displayed shops and animate and show infoWindow
 		// for the one whose button was clicked
