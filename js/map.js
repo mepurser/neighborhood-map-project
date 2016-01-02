@@ -1,10 +1,11 @@
+"use strict";
 // this file was adapted from udacity's front-end web developer nanodegree resume project
 
 // store these global variables to be called outside this file
 var googleMap = '<div id="map"></div>';
 var map;
-markers = ko.observableArray([]);
-infoWindows = ko.observableArray([]);
+var markers = ko.observableArray([]);
+var infoWindows = ko.observableArray([]);
 
 function initializeMap() {
 
@@ -14,9 +15,9 @@ function initializeMap() {
     disableDefaultUI: true
   };
 
-  /* 
+  /*
   For the map to be displayed, the googleMap var must be
-  appended to #mapDiv in neighborhood.js. 
+  appended to #mapDiv in neighborhood.js.
   */
   map = new google.maps.Map(document.querySelector('#map'), mapOptions);
 
@@ -28,19 +29,22 @@ function initializeMap() {
   function locationFinder() {
     // initializes an empty array
     var locations = [];
+
     // adds the single location property to the locations array
-    
-    shops = shopsDisplayed();
-    for (var shop in shops) {
-      var formatted_address = "";
-      formatted_address = 
-        shops[shop].shopName + ", " + 
-        shops[shop].address1 + " " + 
+    var shops = shopsDisplayed();
+    var shop;
+    var locDetails;
+    var formatted_address;
+    for (shop in shops) {
+      formatted_address = "";
+      formatted_address =
+        shops[shop].shopName + ", " +
+        shops[shop].address1 + " " +
         shops[shop].address2 + ", " +
         shops[shop].city + ", " +
         shops[shop].state + " " +
         shops[shop].zip;
-      var locDetails = [
+      locDetails = [
         formatted_address,
         shops[shop].shopName,
         shops[shop].streetView
@@ -57,12 +61,14 @@ function initializeMap() {
   about a single location.
   */
   function createMapMarker(placeData) {
-    
-    function addMarkerContent(data) {          
 
+    function addMarkerContent() {          
+      var contentstring;
+
+      // on error, the api call below simply appears blank in the infowindow,
+      // so no additional handling is included
       contentstring = '<div><b>' + locName + '</b></div>';
       contentstring +='<img src="'+api_req_str+'"><br>';
-
 
       // marker is an object with additional data about the pin for a single location
       var marker = new google.maps.Marker({
@@ -82,16 +88,16 @@ function initializeMap() {
 
 
       google.maps.event.addListener(marker, 'click', function() {
-        
+
         marker.setAnimation(google.maps.Animation.BOUNCE);
-        setTimeout(function() { 
+        setTimeout(function() {
           marker.setAnimation(null);
         }, 1400);
-        
+        var marker_close;
         for (marker_close in markers()) {
           infoWindows()[marker_close].close(map, markers()[marker_close]);
         }
-        
+
         infoWindow.open(map, marker);
       });
 
@@ -112,15 +118,12 @@ function initializeMap() {
     var name = placeData.formatted_address;   // name of the place from the place service
     var bounds = window.mapBounds;            // current boundaries of the map window
 
-    var contentstring = {};
-
     var url = 'https://maps.googleapis.com/maps/api/streetview';
-    var streetViewLoc = ""
 
     var size = '300x150';
     var key = 'AIzaSyCyqnlShlfX9Pc2m8o2RmlpeCEhyY1D0os';
 
-    api_req_str = 
+    var api_req_str =
       url + '?' +
       'size=' + size + '&' +
       'location=' + locStreetView.location + '&' +
@@ -137,7 +140,7 @@ function initializeMap() {
   If so, it creates a new map marker for that location.
   */
   function callback(results, status) {
-    if (status == google.maps.places.PlacesServiceStatus.OK) {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
       locName = locations[locIndex][1];
       locStreetView = locations[locIndex][2];
       createMapMarker(results[0]);
@@ -160,10 +163,12 @@ function initializeMap() {
     var service = new google.maps.places.PlacesService(map);
 
     // Iterates through the array of locations, creates a search object for each location
-    for (var place in locations) {
+    var place;
+    var request;
+    for (place in locations) {
 
       // the search request object
-      var request = {
+      request = {
         query: locations[place][0],
         locName: locations[place][1],
         locStreetView: locations[place][2]
@@ -180,7 +185,7 @@ function initializeMap() {
 
   // locations is an array of location strings returned from locationFinder()
   locations = locationFinder();
-  locIndex = 0;
+  var locIndex = 0;
   // pinPoster(locations) creates pins on the map for each location in
   // the locations array
   pinPoster(locations);

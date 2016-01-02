@@ -16,9 +16,8 @@
 	<body>
 		<div class="container-fluid">
 			<row>
-				
+
 				<div class="col-md-3 shop-panel">
-					
 					<div class="input-group">
 					  <input type="text" class="form-control" placeholder="Ice cream shop" aria-describedby="basic-addon2" data-bind="textInput: filterOnStr, event: {keypress: $root.filter()}">
 					  <span class="input-group-addon" id="basic-addon2" data-bind="click: $root.filter()">
@@ -26,17 +25,10 @@
 					  	 Filter
 					  </span>
 					</div>
-
-
 					<div class="list-group shop-list" data-bind="foreach: shopsDisplayed">
 						<button type="button" class="list-group-item" data-bind="text: shopName, click: $root.markerHighlight">
 						</button>
 					</div>
-				
-
-
-
-
 				</div>
 
 				<div class="col-md-9" id="mapDiv">
@@ -44,8 +36,6 @@
 
 			</row>
 		</div>
-
     <script src="js/neighborhood.js"></script>
 	</body>
-
 </html>
