@@ -81,40 +81,37 @@ function shopsViewModel() {
 	}
 
 	self.markerHighlight = function(shopClicked) {
-
+		// runs 'filter' first to ensure '*Displayed' vars are defined
+		self.filter();
 		var shopClickedName = shopClicked.shopName;
 
-		// on initial load, there's a delay in populating 'markers' in the
-		// 'filter' function above. two lines below check if markersDisplayed
-		// and infoDisplayed are undefined after 'filter' function completes.
-		// if so, they reset their values to the full set.
-		if (markersDisplayed()[0] === undefined) {new markersDisplayed = ko.observableArray(markers());}
-		if (infoDisplayed()[0] === undefined) {new infoDisplayed = ko.observableArray(infoWindows());}
+		if (markersDisplayed()[0] != undefined) {
 
 		// loop through displayed shops and animate and show infoWindow
 		// for the one whose button was clicked
-		for (var shop in shopsDisplayed()) {
+			for (var shop in shopsDisplayed()) {
 
-			var currShop = shopsDisplayed()[shop];
+				var currShop = shopsDisplayed()[shop];
 
-			if (currShop.shopName === shopClickedName) {
-			
-				var dispMarker = markersDisplayed()[shop];
-				var dispInfo = infoDisplayed()[shop];
-			
-				dispMarker.setAnimation(google.maps.Animation.BOUNCE);
-				dispInfo.open(map, dispMarker);
-			
-				setTimeout(function() { 
-					dispMarker.setAnimation(null);
-				}, 1400);
-			
-			} else {
-				// close any other info boxes that are open to avoid clutter
-				infoDisplayed()[shop].close(map, markers()[shop]);
-			
+				if (currShop.shopName === shopClickedName) {
+				
+					var dispMarker = markersDisplayed()[shop];
+					var dispInfo = infoDisplayed()[shop];
+				
+					dispMarker.setAnimation(google.maps.Animation.BOUNCE);
+					dispInfo.open(map, dispMarker);
+				
+					setTimeout(function() { 
+						dispMarker.setAnimation(null);
+					}, 1400);
+				
+				} else {
+					// close any other info boxes that are open to avoid clutter
+					infoDisplayed()[shop].close(map, markers()[shop]);
+				
+				}
+
 			}
-
 		}
 	}
 
