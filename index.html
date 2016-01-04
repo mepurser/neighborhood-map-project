@@ -1,41 +1,45 @@
 <!DOCTYPE html>
 
-	<head>
-	  <meta charset="utf-8">
-	  <title>Neighborhood Map Project</title>
-	  <link href="css/bootstrap.min.css" rel="stylesheet">
-	  <link href="css/neighborhood.css" rel="stylesheet">
-	  <script src="js/jQuery.js"></script>
-	  <script src="js/knockout-3.4.0.js"></script>
-		<script src="js/map.js"></script>
-	  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
-	  <meta name="viewport" content="width=device-width height=device-height">
-	</head>
+    <head>
+      <meta charset="utf-8">
+      <title>Neighborhood Map Project</title>
+      <link href="css/bootstrap.min.css" rel="stylesheet">
+      <link href="css/neighborhood.css" rel="stylesheet">
+      <script src="js/jQuery.js"></script>
+      <script src="js/knockout-3.4.0.js"></script>
+      <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
+      <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha256.js"></script>
+      <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/components/enc-base64-min.js"></script>
+      <script src="js/oauth-1.0a.js"></script>
+      <script src="js/map.js"></script>
+      <meta name="viewport" content="width=device-width height=device-height">
+    </head>
 
 
-	<body>
-		<div class="container-fluid">
-			<row>
+    <body>
+        <div class="container-fluid">
+            <row>
 
-				<div class="col-md-3 shop-panel">
-					<div class="input-group">
-					  <input type="text" class="form-control" placeholder="Ice cream shop" aria-describedby="basic-addon2" data-bind="textInput: filterOnStr, event: {keypress: $root.filter()}">
-					  <span class="input-group-addon" id="basic-addon2" data-bind="click: $root.filter()">
-					  	<span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
-					  	 Filter
-					  </span>
-					</div>
-					<div class="list-group shop-list" data-bind="foreach: shopsDisplayed">
-						<button type="button" class="list-group-item" data-bind="text: shopName, click: $root.markerHighlight">
-						</button>
-					</div>
-				</div>
+                <div class="col-md-3 shop-panel">
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder="Ice cream shop" aria-describedby="basic-addon2" data-bind="textInput: filterOnStr, event: {keyup: $root.filter()}">
+                      <span class="input-group-addon" id="basic-addon2" data-bind="click: $root.filter()">
+                        <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
+                         Filter
+                      </span>
+                    </div>
+                    <div class="list-group shop-list" data-bind="foreach: shopsDisplayed">
+                        <button type="button" class="list-group-item" data-bind="text: shopName, click: $root.markerHighlight">
+                        </button>
+                    </div>
+                </div>
 
-				<div class="col-md-9" id="mapDiv">
-				</div>
+                <div class="col-md-9" id="mapDiv">
+                </div>
 
-			</row>
-		</div>
+            </row>
+        </div>
     <script src="js/neighborhood.js"></script>
-	</body>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCyqnlShlfX9Pc2m8o2RmlpeCEhyY1D0os&callback=initializeMap"></script>
+    </body>
 </html>
