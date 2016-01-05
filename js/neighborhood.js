@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var shopsDisplayed = ko.observableArray([]);
 var markersDisplayed = ko.observableArray([]);
 var infoDisplayed = ko.observableArray([]);
@@ -13,12 +13,13 @@ function IceCreamShop(shopName, address1, address2, city, state, zip, streetView
   self.state = state;
   self.zip = zip;
   self.streetView = streetView;
-  self.yelpid = yelpid
+  self.yelpid = yelpid;
 }
 
 // ********************
-// *****VIEWMODEL*****
+// *****VIEWMODEL******
 // ********************
+
 
 function shopsViewModel() {
   var self = this;
@@ -30,7 +31,7 @@ function shopsViewModel() {
         {location:'37.8281384,-122.2501302', heading: '142', pitch: '-2.18525'},
         'fentons-creamery-oakland-2'),
       new IceCreamShop('Curbside Creamery', '482 49th St', '', 'Oakland', 'California', '94609',
-        {location:'37.8358959,-122.2621143', heading: '37.96', pitch: ''},
+        {location: '37.8358959,-122.2621143', heading: '37.96', pitch: ''},
         'curbside-creamery-oakland'),
       new IceCreamShop('Ben and Jerrys', '505 Embarcadero West', '', 'Oakland', 'California', '94607',
         {location:'37.7959185,-122.2780369', heading: '229.48', pitch: ''},
@@ -43,6 +44,10 @@ function shopsViewModel() {
         'smitten-ice-cream-oakland-3')
   ];
 
+  // alphabetize
+  self.shopsAvailable.sort(function(a,b){
+    return b.shopName > a.shopName ? -1 : 1;
+  });
 
   self.filter = function() {
 
@@ -66,15 +71,29 @@ function shopsViewModel() {
     var shop = '';
     var pos = '';
     var searchStr = '';
+
+    // sort the arrays so that the list corresponds to the correct marker
+    // and infoWindow. the reason this is necessary is that the ajax request
+    // in map.js runs asynchronously and populates the infoWindows and markers
+    // arrays in a different order than shopsDisplayed
+    markers.sort(function(a,b) {
+        return b.shortName > a.shortName ? -1 : 1;
+    });
+
+    infoWindows.sort(function(a,b) {
+        return b.shortName > a.shortName ? -1 : 1;
+    });
+
     for (shop in shops) {
 
       // turn off all markers and infowindows
       if (markers().length > 0) {
-        infoWindows()[shop].close(map, markers()[shop]);
-        markers()[shop].setMap(null);
+        infoWindows()[shop].infoWindowData.close(map, markers()[shop]);
+        markers()[shop].markerInfo.setMap(null);
       }
 
       searchStr = shops[shop].shopName.toLowerCase();
+
 
       // check to see if filterStr is contained in list items (store names).
       // if true, then add store to shopsDisplayed, markersDisplayed, and infoDisplayed.
@@ -86,10 +105,15 @@ function shopsViewModel() {
         markersDisplayed.push(markers()[shop]);
         infoDisplayed.push(infoWindows()[shop]);
         if (markers().length > 0) {
-          markersDisplayed()[dispCount].setMap(map);
+          markersDisplayed()[dispCount].markerInfo.setMap(map);
         }
       }
     }
+
+    shopsDisplayed.sort(function(a,b) {
+        return b.shopName > a.shopName ? -1 : 1;
+    });
+
   };
 
   self.markerHighlight = function(shopClicked) {
@@ -111,8 +135,8 @@ function shopsViewModel() {
 
         if (currShop.shopName === shopClickedName) {
 
-          dispMarker = markersDisplayed()[shop];
-          dispInfo = infoDisplayed()[shop];
+          dispMarker = markersDisplayed()[shop].markerInfo;
+          dispInfo = infoDisplayed()[shop].infoWindowData;
 
           dispMarker.setAnimation(google.maps.Animation.BOUNCE);
           dispInfo.open(map, dispMarker);
@@ -123,7 +147,7 @@ function shopsViewModel() {
 
         } else {
           // close any other info boxes that are open to avoid clutter
-          infoDisplayed()[shop].close(map, markers()[shop]);
+          infoDisplayed()[shop].infoWindowData.close(map, markers()[shop]);
 
         }
 
@@ -131,8 +155,9 @@ function shopsViewModel() {
     }
   };
 
+
 }
 
-ko.applyBindings(new shopsViewModel);
+ko.applyBindings(new shopsViewModel());
 
 $('#mapDiv').append(googleMap);

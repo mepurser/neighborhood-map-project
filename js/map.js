@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 // this file was adapted from udacity's front-end web developer nanodegree resume project
 
 // store these global variables to be called outside this file
@@ -61,53 +61,53 @@ function initializeMap() {
   function createMapMarker(placeData) {
 
     function addMarkerContent(data) {          
-      
-      var lat = placeData.geometry.location.lat();  // latitude from the place service
-      var lon = placeData.geometry.location.lng();  // longitude from the place service
-      var name = placeData.formatted_address;   // name of the place from the place service
-      var bounds = window.mapBounds;            // current boundaries of the map window
+      var self = this;
+      self.lat = placeData.geometry.location.lat();  // latitude from the place service
+      self.lon = placeData.geometry.location.lng();  // longitude from the place service
+      self.name = placeData.formatted_address;   // name of the place from the place service
+      self.bounds = window.mapBounds;            // current boundaries of the map window
+      self.shortName = data.name;
 
-      var contentstring;
-      contentstring ='<div><b>' + data.name + '</b></div>';
-      contentstring +='<div><img src="' + data.rating_img_url_small + '"></div>';
-      contentstring +='<div><img src="' +data.image_url + '"></div>';
+      self.contentstring;
+      self.contentstring ='<div><b>' + self.shortName + '</b></div>';
+      self.contentstring +='<div><img src="' + data.rating_img_url_small + '"></div>';
+      self.contentstring +='<div><img src="' +data.image_url + '"></div>';
 
       // marker is an object with additional data about the pin for a single location
-      var marker = new google.maps.Marker({
+      self.marker = new google.maps.Marker({
         map: map,
         position: placeData.geometry.location,
-        title: name
+        title: self.name
       });
 
-      markers.push(marker);
+      markers.push({shortName : self.shortName, markerInfo: self.marker});
 
-      var infoWindow = new google.maps.InfoWindow({
-        content: contentstring
+      self.infoWindow = new google.maps.InfoWindow({
+        content: self.contentstring
       });
 
-      google.maps.event.addListener(marker, 'click', function() {
+      google.maps.event.addListener(self.marker, 'click', function() {
 
-        marker.setAnimation(google.maps.Animation.BOUNCE);
+        self.marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
-          marker.setAnimation(null);
+          self.marker.setAnimation(null);
         }, 1400);
         var marker_close;
         for (marker_close in markers()) {
-          infoWindows()[marker_close].close(map, markers()[marker_close]);
+          infoWindows()[marker_close].infoWindowData.close(map, markers()[marker_close]);
         }
 
-        infoWindow.open(map, marker);
+        self.infoWindow.open(map, self.marker);
       });
 
-      infoWindows.push(infoWindow);
+      infoWindows.push({shortName : self.shortName, infoWindowData: self.infoWindow});
       // this is where the pin actually gets added to the map.
       // bounds.extend() takes in a map location object
-      bounds.extend(new google.maps.LatLng(lat, lon));
+      self.bounds.extend(new google.maps.LatLng(self.lat, self.lon));
       // fit the map to the new marker
-      map.fitBounds(bounds);
+      map.fitBounds(self.bounds);
       // center the map
-      map.setCenter(bounds.getCenter());
-
+      map.setCenter(self.bounds.getCenter());
     }
 
     // function generate nonce
@@ -149,14 +149,15 @@ function initializeMap() {
       public: yelp_token,
       secret: yelp_token_secret
     };
-
     $.ajax({
       url: request_data.url,
       type: request_data.method,
       dataType: "json",
       data: oauth.authorize(request_data, token),
       error: function(xhr, ajaxOptions){console.log(xhr, ajaxOptions);},
-      success: function(response){addMarkerContent(response);}
+      success: function(response){
+        addMarkerContent.call(this, response);
+      }
     });
       
   }
@@ -194,7 +195,6 @@ function initializeMap() {
     var place;
     var request;
     for (place in locations) {
-
       // the search request object
       request = {
         query: locations[place][0],
