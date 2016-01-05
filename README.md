@@ -10,3 +10,5 @@ Neighborhood map application
 Sources
 -------
 Most of the code in the map.js file is adapted from code provided by Udacity for the earlier 'resume' project.
+
+The file 'oauth-1.0a.js' is used for oauth access. This file was obtained from user Ddo's github.
