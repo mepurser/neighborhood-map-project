@@ -155,6 +155,11 @@ function shopsViewModel() {
     }
   };
 
+  self.collapseList = function() {
+    console.log('test');
+    $('.collapse').collapse('hide');
+  };
+
 
 }
 

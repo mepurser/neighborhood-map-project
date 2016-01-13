@@ -35,3 +35,19 @@ ul {
 .shop-list {
 	padding: 10px 0px 0px 10px;
 }
+
+.collapse-btn {
+	margin: 10px 10px 10px 10px;
+}
+
+@media (max-width: 768px) {
+	.non-mobile-menu {
+		display: none;
+	}
+}
+
+@media (min-width: 768px) {
+	.mobile-menu {
+		display: none;
+	}
+}

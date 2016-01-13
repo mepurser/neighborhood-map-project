@@ -159,7 +159,7 @@ function initializeMap() {
       data: parameters,
       cache: true,
       dataType: 'jsonp',
-      jsonpCallback: 'cb',
+      //jsonpCallback: 'cb',
       success: function(data) {
         console.log(data);
         addMarkerContent.call(this, placeData, data, nameForMarker);

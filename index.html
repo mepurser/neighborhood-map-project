@@ -3,9 +3,10 @@
     <head>
       <meta charset="utf-8">
       <title>Neighborhood Map Project</title>
+      <script src="js/jQuery.js"></script>
+      <script src="js/bootstrap.min.js"></script>
       <link href="css/bootstrap.min.css" rel="stylesheet">
       <link href="css/neighborhood.css" rel="stylesheet">
-      <script src="js/jQuery.js"></script>
       <script src="js/knockout-3.4.0.js"></script>
       <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
       <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha256.js"></script>
@@ -21,17 +22,34 @@
             <row>
 
                 <div class="col-md-3 shop-panel">
-                    <div class="input-group">
-                      <input type="text" class="form-control" placeholder="Ice cream shop" aria-describedby="basic-addon2" data-bind="textInput: filterOnStr, event: {keyup: $root.filter()}">
-                      <span class="input-group-addon" id="basic-addon2" data-bind="click: $root.filter()">
-                        <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
-                         Filter
-                      </span>
-                    </div>
-                    <div class="list-group shop-list" data-bind="foreach: shopsDisplayed">
+                
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Ice cream shop" aria-describedby="basic-addon2" data-bind="textInput: filterOnStr, event: {keyup: $root.filter()}">
+                    <span class="input-group-addon" id="basic-addon2" data-bind="click: $root.filter()">
+                      <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
+                       Filter
+                    </span>
+                  </div>
+                  
+                  <div class='mobile-menu'>    
+                    <button type="button" class="collapse-btn" data-toggle="collapse" data-target="#shopList">
+                      <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+                    </button>
+                    <div class="collapse" id="shopList" data-bind="click: $root.collapseList()">
+                      <div class="list-group shop-list" data-bind="foreach: shopsDisplayed">
                         <button type="button" class="list-group-item" data-bind="text: shopName, click: $root.markerHighlight">
                         </button>
+                      </div>
                     </div>
+                  </div>
+
+                  <div class='non-mobile-menu'>    
+                      <div class="list-group shop-list" data-bind="foreach: shopsDisplayed">
+                        <button type="button" class="list-group-item" data-bind="text: shopName, click: $root.markerHighlight">
+                        </button>
+                      </div>
+                  </div>
+
                 </div>
 
                 <div class="col-md-9" id="mapDiv">
