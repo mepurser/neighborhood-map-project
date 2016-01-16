@@ -1,7 +1,7 @@
 'use strict';
+
 var shopsDisplayed = ko.observableArray([]);
-var markersDisplayed = ko.observableArray([]);
-var infoDisplayed = ko.observableArray([]);
+var mapSet = false; // set to true after 'initializeMap()' completes
 
 // class to represent row in the available shops array
 function IceCreamShop(shopName, address1, address2, city, state, zip, streetView, yelpid) {
@@ -14,12 +14,14 @@ function IceCreamShop(shopName, address1, address2, city, state, zip, streetView
   self.zip = zip;
   self.streetView = streetView;
   self.yelpid = yelpid;
+  self.yelpRatingUrl = '';
+  self.yelpImg = '';
+  self.marker = {markerInfo: ''};
 }
 
 // ********************
 // *****VIEWMODEL******
 // ********************
-
 
 function shopsViewModel() {
   var self = this;
@@ -28,87 +30,64 @@ function shopsViewModel() {
   // hard-wired initial list of ice cream shops
   self.shopsAvailable = [
       new IceCreamShop('Fentons Creamery', '4226 Piedmont Ave', '', 'Oakland', 'California', '94611',
-        {location:'37.8281384,-122.2501302', heading: '142', pitch: '-2.18525'},
+        {location: {lat: 37.8281384, lng: -122.2501302}, heading: '142', pitch: '-2.18525'},
         'fentons-creamery-oakland-2'),
       new IceCreamShop('Curbside Creamery', '482 49th St', '', 'Oakland', 'California', '94609',
-        {location: '37.8358959,-122.2621143', heading: '37.96', pitch: ''},
+        {location: {lat: 37.8358959, lng: -122.2621143}, heading: '37.96', pitch: ''},
         'curbside-creamery-oakland'),
       new IceCreamShop('Ben and Jerrys', '505 Embarcadero West', '', 'Oakland', 'California', '94607',
-        {location:'37.7959185,-122.2780369', heading: '229.48', pitch: ''},
+        {location: {lat: 37.7959185, lng: -122.2780369}, heading: '229.48', pitch: ''},
         'ben-and-jerrys-oakland'),
       new IceCreamShop('Sweet Booth', '388 9th St', '', 'Oakland', 'California', '94607',
-        {location:'37.8003083,-122.2718405', heading: '26.85', pitch: ''},
+        {location: {lat: 37.8003083, lng: -122.2718405}, heading: '26.85', pitch: ''},
         'the-sweet-booth-oakland'),
       new IceCreamShop('Smitten Ice Cream', '5800 College Ave', '', 'Oakland', 'California', '94618',
-        {location:'37.846053,-122.2516726', heading: '327.45', pitch: ''},
+        {location: {lat: 37.846053, lng: -122.2516726}, heading: '327.45', pitch: ''},
         'smitten-ice-cream-oakland-3')
   ];
 
-  // alphabetize
-  self.shopsAvailable.sort(function(a,b){
-    return b.shopName > a.shopName ? -1 : 1;
-  });
-
+  // filters list according to term in filter box
   self.filter = function() {
 
-    // clear original shopsDisplayed array
-    // these three arrays always have the same length,
-    // so it's sufficient to loop only on shopsDisplayed.
-    while(shopsDisplayed().length > 0) {
-      shopsDisplayed().pop();
-      markersDisplayed().pop();
-      infoDisplayed().pop();
-    }
-
-    // simplify naming
     var filterStr = self.filterOnStr();
     var shops = self.shopsAvailable;
-
-    // check whether filter term exists in each store name
-    // if it does, the shop is added back to shopsDisplayed (which was
-    // cleared out a few lines earlier in this function)
     var dispCount = -1;
-    var shop = '';
-    var pos = '';
-    var searchStr = '';
+    var pos;
+    var searchStr;
+    var currMarker;
 
-    // sort the arrays so that the list corresponds to the correct marker
-    // and infoWindow. the reason this is necessary is that the ajax request
-    // in map.js runs asynchronously and populates the infoWindows and markers
-    // arrays in a different order than shopsDisplayed
-    markers.sort(function(a,b) {
-        return b.shortName > a.shortName ? -1 : 1;
-    });
-
-    infoWindows.sort(function(a,b) {
-        return b.shortName > a.shortName ? -1 : 1;
-    });
-
-    for (shop in shops) {
-
-      // turn off all markers and infowindows
-      if (markers().length > 0) {
-        infoWindows()[shop].infoWindowData.close(map, markers()[shop]);
-        markers()[shop].markerInfo.setMap(null);
-      }
-
-      searchStr = shops[shop].shopName.toLowerCase();
-
-
-      // check to see if filterStr is contained in list items (store names).
-      // if true, then add store to shopsDisplayed, markersDisplayed, and infoDisplayed.
-      // then make the markers visible (they were turned off above)
-      pos = searchStr.search(filterStr.toLowerCase());
-      if (pos > -1) {
-        dispCount += 1;
-        shopsDisplayed.push(shops[shop]);
-        markersDisplayed.push(markers()[shop]);
-        infoDisplayed.push(infoWindows()[shop]);
-        if (markers().length > 0) {
-          markersDisplayed()[dispCount].markerInfo.setMap(map);
-        }
-      }
+    // clear original shopsDisplayed array
+    // repopulate below
+    while(shopsDisplayed().length > 0) {
+      shopsDisplayed().pop();
     }
+
+    shops.forEach(function(shop) {
+
+      currMarker = shop.marker.markerInfo;
+
+      // clear all markers from map
+      if (mapSet) {
+        currMarker.setMap(null);
+      }
+
+      searchStr = shop.shopName.toLowerCase();
+
+      pos = searchStr.search(filterStr.toLowerCase());
+
+      if (pos > -1) {
+
+        // repopulate shopsDisplayed according to filter
+        dispCount += 1;
+        shopsDisplayed.push(shop);
+
+        // add markers back to map
+        if (mapSet) {
+          currMarker.setMap(map);
+        }
+
+      }
+    });
 
     shopsDisplayed.sort(function(a,b) {
         return b.shopName > a.shopName ? -1 : 1;
@@ -116,50 +95,35 @@ function shopsViewModel() {
 
   };
 
+  // when a shop is selected in the list, this function makes
+  // the marker bounce and opens the infoWindow
   self.markerHighlight = function(shopClicked) {
-    // runs 'filter' first to ensure '*Displayed' vars are defined
-    self.filter();
+
     var shopClickedName = shopClicked.shopName;
+    var shops = shopsDisplayed();
+    var dispMarker = {};
+    
+    // filter first to make sure correct selection is displayed
+    self.filter();
 
-    if (markersDisplayed()[0] !== undefined) {
+    // loop thru all shops displayed
+    shops.forEach(function(shop) {
+      if (shop.marker.markerInfo !== undefined) {
 
-    // loop through displayed shops and animate and show infoWindow
-    // for the one whose button was clicked
-      var shop = '';
-      var currShop = '';
-      var dispMarker = {};
-      var dispInfo = {};
-      for (shop in shopsDisplayed()) {
-
-        currShop = shopsDisplayed()[shop];
-
-        if (currShop.shopName === shopClickedName) {
-
-          dispMarker = markersDisplayed()[shop].markerInfo;
-          dispInfo = infoDisplayed()[shop].infoWindowData;
-
-          dispMarker.setAnimation(google.maps.Animation.BOUNCE);
-          dispInfo.open(map, dispMarker);
-
-          setTimeout(function() {
-            dispMarker.setAnimation(null);
-          }, 1400);
-
-        } else {
-          // close any other info boxes that are open to avoid clutter
-          infoDisplayed()[shop].infoWindowData.close(map, markers()[shop]);
-
+        // if the current shop in loop is the clicked shop
+        // then call markerClick() as of the marker was clicked
+        if (shop.shopName === shopClickedName) {
+          markerClick(shop, shop.marker.markerInfo, infoWindow);
         }
 
       }
-    }
+    });
+
   };
 
   self.collapseList = function() {
-    console.log('test');
     $('.collapse').collapse('hide');
   };
-
 
 }
 
